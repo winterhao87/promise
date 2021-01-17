@@ -1,5 +1,5 @@
 demo: demo.cc promise.h
-	g++ -std=c++17 -Wall -g -o $@ $^
+	g++ -std=c++17 -Wall -g $< -o $@
 
 .phony: clean
 

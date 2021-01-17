@@ -1,6 +1,5 @@
 #include "promise.h"
 #include <iostream>
-#include <assert.h>
 
 class TestException : public std::exception {
 public:
@@ -31,22 +30,23 @@ int main(int argc, char *argv[]) {
     assert(0);
     return async::MakeReadyPromise(std::move(num));
   })
-  .Exception([](std::exception *e) {
+  .Exception([](SException e) {
     assert(e);
     assert(std::string(e->what()) == "NonExcep");
-    // std::cout << "exception: " << e->what() << std::endl;
+    std::cout << "exception: " << e->what() << std::endl;
     return async::MakeReadyPromise();
   })
   .Then([]() {
-    // std::cout << "Got EmptyReadyFuture" << std::endl;
+    std::cout << "Got EmptyReadyFuture" << std::endl;
     return async::MakeException(new TestException("TestString Exception"));
   })
-  .Finally([](std::exception *e) {
+  .Finally([](SException e) {
     assert(e);
-    if (e) {
+    assert(e->what());
+    if (e && e->what()) {
       assert(std::string(e->what()) == "TestString Exception");
       // std::cout << "Finally exception: " << e->what() << std::endl;
-      std::cout << "test succ\n";
+      std::cout << "test succ, " << std::string(e->what()) << std::endl;
     } else {
       std::cout << "Finally No exception" << std::endl;
       std::cout << "test fail\n";
